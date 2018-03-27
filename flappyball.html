@@ -1,0 +1,120 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"></script>
+        <script>
+            var rectangles = [];
+            var atTop = 0; 
+
+            var Rectangle = function() {
+                this.h = (height/2 -(Math.random()*100)) || 5; 
+                this.w = 30;
+                this.x = width;
+                
+                if(!(atTop < 0.5)){
+                    this.y = 0;
+                }
+                else {
+                    this.y = height - this.h;
+                }
+            }
+
+            Rectangle.prototype.drawRectangle = function(){
+                fill(255, 150, 0);
+                rect(this.x, this.y, this.w, this.h);
+            }
+            Rectangle.prototype.move = function(){
+                var speed = 3;
+                this.x -= speed; 
+            }
+            Rectangle.prototype.resetX = function(){
+                this.x = width; 
+            }
+
+            var Player = function(){
+                this.x = 25; 
+                this.y = height/2;
+                this.w = 30;
+                this.h = 30;
+                this.velocity = 0;
+            }
+            Player.prototype.pong = function(){
+                this.velocity -= 12;
+            }
+            Player.prototype.drawPlayer = function(){
+                fill(255, 0, 100);
+                ellipse(this.x, this.y, this.w, this.h);
+            }
+            Player.prototype.drop = function(){
+                var g = 0.5;
+                this.velocity += g; 
+                this.y += this.velocity; 
+            }
+
+            function setup(){
+                createCanvas(600, 400);
+                p1 = new Player();              
+            }
+
+            function draw(){
+                background(100);
+                if(p1.y > height || p1.y < 0){
+                    noLoop();
+                }
+                else {
+                    if(playerTouchedRectangle()){
+                        noLoop();
+                    }
+                    else {
+                        p1.drop();
+                        //p1.y = 20;
+                    }
+                }
+                p1.drawPlayer();
+                updateRectangles();
+            }
+
+            function playerTouchedRectangle(){
+                for(var i =0; i < rectangles.length; i++){
+                    var r = rectangles[i];
+                    if(!r.y && p1.y <= r.h && p1.x >= r.x){
+                        return true;
+                    }
+                    if(r.y && r.x <= p1.x && p1.y >= r.y){
+                        return true; 
+                    }
+                }
+                return false;
+            }
+
+            function updateRectangles(){
+                if(rectangles[0]) {
+                    //if(rectangles[rectangles.length -1].x < 0){
+                    if(rectangles[0].x < -rectangles[0].w){
+                        rectangles.splice(rectangles.lenght -1, 1);
+                    }
+                    if(rectangles[rectangles.length - 1].x < width - 100){
+                        atTop = random();
+                        rectangles.push(new Rectangle);
+                    }
+                    rectangles.forEach(function(r){
+                       r.drawRectangle();
+                       r.move();  
+                    });
+                }
+                else {
+                    atTop = random();
+                    rectangles.push(new Rectangle);
+                }
+            }
+
+            function keyTyped(){
+                if(key == " "){
+                    p1.pong();
+                }
+            }
+        </script>
+    </head>
+    <body>
+    
+    </body>
+</html>
